@@ -1,0 +1,16 @@
+# Core app
+streamlit>=1.32
+pandas>=2.0
+altair>=5.0
+
+# Deep learning
+tensorflow>=2.13
+tf-keras>=2.15
+tensorflow-hub>=0.16
+
+# ML / image processing
+numpy>=1.23
+pillow>=10.0
+
+# Hugging Face model download
+huggingface_hub>=0.20.0
