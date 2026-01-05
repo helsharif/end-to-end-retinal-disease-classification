@@ -185,8 +185,8 @@ cython_debug/
 secrets/
 
 # ignore shortcut links
-.lnk
+*.lnk
 
 # large ML model files
-.pth
-.keras
+*.pth
+*.keras
