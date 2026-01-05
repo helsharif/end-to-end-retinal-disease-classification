@@ -111,9 +111,8 @@ http://localhost:8502
 .
 ├── images/                         # Sample images and figures
 ├── logs/                           # Training and experiment logs
-├── saved_models_pytorch/           # Trained PyTorch models
-├── saved_models_tensorflow/        # Trained TensorFlow models
-├── secrets/                        # (Ignored) credentials / local configs
+├── saved_models_pytorch/           # Trained PyTorch models (create from Model Development Notebooks)
+├── saved_models_tensorflow/        # Trained TensorFlow models (create from Model Development Notebooks)
 ├── streamlit_app/                  # Streamlit application
 │   ├── app.py
 │   ├── class_names.json
@@ -158,7 +157,6 @@ This project is for **research and educational purposes only** and is **not inte
 ## 👤 Author
 
 **Husayn El Sharif**  
-PhD, Civil & Environmental Engineering (Hydrology)  
 Senior Data Scientist / Machine Learning Engineer
 
 ---
