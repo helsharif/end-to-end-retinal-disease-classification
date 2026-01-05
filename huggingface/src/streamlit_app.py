@@ -126,6 +126,11 @@ st.set_page_config(page_title="Eye Disease Classifier", page_icon="👁️", lay
 
 st.title("👁️ Eye Disease Prediction")
 st.write("Upload a single retinal image and get a model prediction.")
+st.info(
+    "📥 **Try the app with example retinal images**\n\n"
+    "[Download example images from my GitHub Repository]"
+    "(https://github.com/helsharif/end-to-end-retinal-disease-classification/tree/main/example_images)"
+)
 
 with st.expander("Model details", expanded=False):
     st.write("- Input size:", (IMG_H, IMG_W))
@@ -166,3 +171,18 @@ if uploaded is not None:
                 st.write(f"- `{label}`: {p:.4f}")
 else:
     st.info("Upload a JPG/PNG image to enable prediction.")
+
+
+st.write("")  # spacer
+st.write("")
+# -----------------------------
+# Footer (author credit)
+# -----------------------------
+st.markdown(
+    "<hr style='margin-top:2rem;margin-bottom:1rem;'>"
+    "<div style='text-align:center; font-size:0.85em; color:gray;'>"
+    "Built by <b>Husayn El Sharif</b> · "
+    "<a href='https://github.com/helsharif' target='_blank'>https://github.com/helsharif</a>"
+    "</div>",
+    unsafe_allow_html=True,
+)
