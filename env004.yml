@@ -1,0 +1,38 @@
+name: env004
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scikit-learn
+  - boto3
+  - catboost
+  - cloudpathlib
+  - dash
+  - findspark
+  - folium
+  - gplearn
+  - imbalanced-learn
+  - ipympl
+  - ipywidgets
+  - jupyterlab
+  - matplotlib
+  - msgspec
+  - nbconvert
+  - nodejs
+  - pathvalidate
+  - plotly
+  - pyspark
+  - scipy
+  - seaborn
+  - statsmodels
+  - sympy
+  - xgboost
+  - mlflow
+  - streamlit
+  - pip
+  - pytorch::pytorch
+  - pytorch::torchvision
+  - pytorch::torchaudio
+  - pytorch::pytorch-cuda=12.4

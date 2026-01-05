@@ -1,0 +1,159 @@
+# Husayn El Sharif
+
+import json
+import glob
+import os
+import numpy as np
+import streamlit as st
+
+import tensorflow as tf
+import tf_keras as keras # Import tf_keras for Keras 3 compatibility
+import tensorflow_hub as hub
+
+if os.getenv("STREAMLIT_SERVER_PORT"):
+    port = os.getenv("STREAMLIT_SERVER_PORT")
+else:
+    port = "8502"
+
+print(f"\n✅ Open the app in your browser at: http://localhost:{port}\n", flush=True)
+
+
+# -----------------------------
+# Config
+# -----------------------------
+IMG_H = 456
+IMG_W = 456
+
+APP_DIR = os.path.dirname(os.path.abspath(__file__))
+CLASS_NAMES_PATH = os.path.join(APP_DIR, "class_names.json")
+
+# Your notebook searches like: 'saved_models_tensorflow/**/best_model.keras'
+# We'll do the same, but relative to the project root (parent of streamlit_app/)
+PROJECT_ROOT = os.path.abspath(os.path.join(APP_DIR, ".."))
+MODEL_GLOB = os.path.join(PROJECT_ROOT, "saved_models_tensorflow", "**", "best_model.keras")
+
+
+# -----------------------------
+# Helpers
+# -----------------------------
+def load_class_names(path: str) -> list[str]:
+    with open(path, "r") as f:
+        return json.load(f)
+
+
+def find_latest_model_file(pattern: str) -> str:
+    files = glob.glob(pattern, recursive=True)
+    if not files:
+        raise FileNotFoundError(
+            f"No model found. Looked for pattern:\n{pattern}\n\n"
+            "Make sure saved_models_tensorflow/**/best_model.keras exists."
+        )
+    # match your notebook logic: "latest created"
+    return max(files, key=os.path.getctime)
+
+
+def preprocess_bytes_to_tensor(image_bytes: bytes, img_height=IMG_H, img_width=IMG_W) -> tf.Tensor:
+    """
+    Mirrors your notebook preprocessing:
+    - decode image
+    - pad to square
+    - convert to float32 [0..1]
+    - resize to (456,456)
+    Returns: (H,W,3) float32 tensor
+    """
+    image = tf.image.decode_image(image_bytes, channels=3, expand_animations=False)
+    image.set_shape([None, None, 3])
+
+    h = tf.shape(image)[0]
+    w = tf.shape(image)[1]
+    side = tf.maximum(h, w)
+    image = tf.image.pad_to_bounding_box(
+        image,
+        offset_height=(side - h) // 2,
+        offset_width=(side - w) // 2,
+        target_height=side,
+        target_width=side,
+    )
+
+    image = tf.image.convert_image_dtype(image, tf.float32)  # [0..1]
+    image = tf.image.resize(image, size=[img_height, img_width], method=tf.image.ResizeMethod.AREA)
+    return image
+
+
+@st.cache_resource
+def load_model_and_labels():
+    class_names = load_class_names(CLASS_NAMES_PATH)
+    model_path = find_latest_model_file(MODEL_GLOB)
+
+    model = keras.models.load_model(
+        model_path,
+        custom_objects={"KerasLayer": hub.KerasLayer},
+        compile=False,  # usually fine for inference
+    )
+    return model, class_names, model_path
+
+
+def predict_single_image_bytes(model, class_names, image_bytes: bytes):
+    img = preprocess_bytes_to_tensor(image_bytes)
+    x = tf.expand_dims(img, axis=0)  # (1,H,W,3)
+
+    probs = model.predict(x, verbose=0)[0]
+    probs = np.asarray(probs).astype(float)
+
+    pred_idx = int(np.argmax(probs))
+    pred_label = class_names[pred_idx]
+    confidence = float(probs[pred_idx])
+
+    # top-k (optional)
+    topk_idx = probs.argsort()[::-1]
+    topk = [(class_names[i], float(probs[i])) for i in topk_idx]
+
+    return pred_label, confidence, probs, topk
+
+
+# -----------------------------
+# UI
+# -----------------------------
+st.set_page_config(page_title="Eye Disease Classifier", page_icon="👁️", layout="centered")
+
+st.title("👁️ Eye Disease Prediction")
+st.write("Upload a single retinal image and get a model prediction.")
+
+with st.expander("Model details", expanded=False):
+    st.write("- Input size:", (IMG_H, IMG_W))
+    st.write("- Classes loaded from:", CLASS_NAMES_PATH)
+
+# Load model
+try:
+    model, class_names, model_path = load_model_and_labels()
+    st.caption(f"Loaded model: `{os.path.relpath(model_path, PROJECT_ROOT)}`")
+except Exception as e:
+    st.error("Failed to load model / labels.")
+    st.exception(e)
+    st.stop()
+
+uploaded = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+
+if uploaded is not None:
+    image_bytes = uploaded.read()
+
+    st.image(image_bytes, caption="Uploaded image", use_container_width=True)
+
+    if st.button("Predict", type="primary"):
+        with st.spinner("Running inference..."):
+            pred_label, confidence, probs, topk = predict_single_image_bytes(model, class_names, image_bytes)
+
+        st.subheader("Prediction")
+        st.write(f"**Predicted class:** `{pred_label}`")
+        st.write(f"**Confidence:** `{confidence:.3f}`")
+
+        st.subheader("Class probabilities")
+        # Streamlit wants a simple structure for charts
+        chart_data = {class_names[i]: float(probs[i]) for i in range(len(class_names))}
+        st.bar_chart(chart_data)
+
+        with st.expander("Top-k details"):
+            for label, p in topk:
+                st.write(f"- `{label}`: {p:.4f}")
+else:
+    st.info("Upload a JPG/PNG image to enable prediction.")

@@ -1,0 +1,40 @@
+name: env003
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - numpy
+  - pandas
+  - scikit-learn
+  - boto3
+  - catboost
+  - cloudpathlib
+  - dash
+  - findspark
+  - folium
+  - gplearn
+  - imbalanced-learn
+  - ipympl
+  - ipywidgets
+  - jupyterlab
+  - matplotlib
+  - msgspec
+  - nbconvert
+  - nodejs
+  - pathvalidate
+  - plotly
+  - pyspark
+  - scipy
+  - seaborn
+  - statsmodels
+  - sympy
+  - xgboost
+  - mlflow
+  - streamlit
+  - cudnn
+  - pip
+  - pip:
+    - tensorflow
+    - tensorflow-hub
+    - tf-keras

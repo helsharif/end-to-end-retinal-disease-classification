@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: streamlit_app/Dockerfile
+    ports:
+      - "8502:8502"
+    # Optional: mount code for live edits (dev only)
+    volumes:
+      - .:/app
+    environment:
+      - STREAMLIT_SERVER_PORT=8502
+      - STREAMLIT_SERVER_ADDRESS=0.0.0.0
+    command: >
+      bash -lc 'echo "✅ Open the app in your browser at: http://localhost:8502";
+      streamlit run streamlit_app/app.py --server.address=0.0.0.0 --server.port=8502'
