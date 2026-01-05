@@ -4,6 +4,12 @@
 
 ---
 
+🚀 **Live Demo:**  
+https://helsharif-retinal-disease-classifier.hf.space
+
+
+---
+
 ## 🚀 Project Highlights
 
 - **Task:** Multi-class retinal disease classification
