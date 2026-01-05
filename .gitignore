@@ -184,6 +184,9 @@ cython_debug/
 # secrets folder
 secrets/
 
+# archive folder
+archive/
+
 # ignore shortcut links
 *.lnk
 
